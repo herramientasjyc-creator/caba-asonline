@@ -14,3 +14,4 @@ Proyecto base Ionic Angular + Capacitor con CI/CD (GitHub Actions).
 3. `npm run build:web` (producción web)
 
 Configura secrets en GitHub (FIREBASE_TOKEN, ANDROID_KEYSTORE_BASE64, etc.) para CI/CD.
+# Cabanasonline
