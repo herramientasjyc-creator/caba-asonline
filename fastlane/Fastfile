@@ -1,0 +1,22 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and export iOS archive"
+  lane :build do
+    match(type: "appstore")
+    cocoapods
+    increment_build_number
+    build_app(
+      workspace: "ios/App/App.xcworkspace",
+      scheme: "App",
+      export_method: "app-store"
+    )
+  end
+end
+
+platform :android do
+  desc "Build Android release via gradle"
+  lane :build do
+    gradle(task: "assembleRelease", project_dir: "android")
+  end
+end

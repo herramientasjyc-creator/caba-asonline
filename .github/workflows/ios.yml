@@ -1,0 +1,36 @@
+name: iOS Build
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build web
+        run: npm run build:web
+      - name: Install bundler and fastlane
+        run: |
+          sudo gem install bundler
+          bundle install || true
+      - name: Sync Capacitor iOS
+        run: npx cap sync ios
+      - name: Run Fastlane (iOS)
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+        run: bundle exec fastlane ios build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-archive
+          path: fastlane/output
