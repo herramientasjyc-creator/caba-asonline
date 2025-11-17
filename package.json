@@ -1,0 +1,21 @@
+{
+  "name": "cabañasonline",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "ng": "ng",
+    "start": "ionic serve",
+    "build:web": "ionic build --prod",
+    "build:android": "npm run build:web && npx cap sync android",
+    "build:ios": "npm run build:web && npx cap sync ios",
+    "lint": "ng lint",
+    "test": "ng test --watch=false --browsers=ChromeHeadless",
+    "e2e": "ng e2e",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.html\""
+  },
+  "devDependencies": {
+    "@angular/cli": "^15.0.0",
+    "@ionic/cli": "^7.0.0",
+    "prettier": "^2.0.0"
+  }
+}

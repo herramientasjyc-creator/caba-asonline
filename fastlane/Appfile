@@ -1,0 +1,2 @@
+apple_id("your@apple.id") # reemplaza con tu Apple ID
+app_identifier("com.tuempresa.cabanasonline") # reemplaza con el bundle id
