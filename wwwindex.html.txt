@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cabañasonline</title>
+  <link rel="stylesheet" href="./assets/styles.css"/>
+</head>
+<body>
+  <header class="header">
+    <h1>Cabañasonline</h1>
+    <nav class="nav">
+      <button class="tab-btn" data-tab="usuarios">Usuarios</button>
+      <button class="tab-btn" data-tab="reservas">Reservas</button>
+      <button class="tab-btn" data-tab="costos">Costos</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Usuarios -->
+    <section id="usuarios" class="tab active">
+      <h2>Usuarios</h2>
+      <form id="formUsuario" class="form-grid">
+        <div>
+          <label for="uNombre">Nombre</label>
+          <input id="uNombre" type="text" placeholder="Nombre completo" required/>
+        </div>
+        <div>
+          <label for="uEmail">Email</label>
+          <input id="uEmail" type="email" placeholder="correo@ejemplo.com" required/>
+        </div>
+        <div>
+          <label for="uTelefono">Teléfono</label>
+          <input id="uTelefono" type="tel" placeholder="+57..." />
+        </div>
+        <button type="submit" class="primary">Guardar usuario</button>
+      </form>
+
+      <h3>Lista de usuarios</h3>
+      <table class="table" id="tablaUsuarios">
+        <thead>
+          <tr>
+            <th>Nombre</th><th>Email</th><th>Teléfono</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Reservas -->
+    <section id="reservas" class="tab">
+      <h2>Reservas</h2>
+      <form id="formReserva" class="form-grid">
+        <div>
+          <label for="rUsuario">Usuario</label>
+          <select id="rUsuario" required></select>
+        </div>
+        <div>
+          <label for="rCabana">Cabaña</label>
+          <input id="rCabana" type="text" placeholder="Nombre de la cabaña" required/>
+        </div>
+        <div>
+          <label for="rInicio">Inicio</label>
+          <input id="rInicio" type="date" required/>
+        </div>
+        <div>
+          <label for="rFin">Fin</label>
+          <input id="rFin" type="date" required/>
+        </div>
+        <div>
+          <label for="rPersonas">Personas</label>
+          <input id="rPersonas" type="number" min="1" value="1" required/>
+        </div>
+        <button type="submit" class="primary">Crear reserva</button>
+      </form>
+
+      <h3>Reservas activas</h3>
+      <table class="table" id="tablaReservas">
+        <thead>
+          <tr>
+            <th>Usuario</th><th>Cabaña</th><th>Inicio</th><th>Fin</th><th>Noches</th><th>Personas</th><th>Total</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Costos -->
+    <section id="costos" class="tab">
+      <h2>Costos</h2>
+      <form id="formCostos" class="form-grid">
+        <div>
+          <label for="cBaseNoche">Costo base por noche (COP)</label>
+          <input id="cBaseNoche" type="number" min="0" value="120000" required/>
+        </div>
+        <div>
+          <label for="cExtraPersona">Extra por persona adicional (COP)</label>
+          <input id="cExtraPersona" type="number" min="0" value="20000" required/>
+        </div>
+        <div>
+          <label for="cImpuesto">Impuesto (%)</label>
+          <input id="cImpuesto" type="number" min="0" max="100" value="19" required/>
+        </div>
+        <button type="submit" class="primary">Actualizar costos</button>
+      </form>
+
+      <div class="card">
+        <h3>Ejemplo de cálculo</h3>
+        <p>Se calcula: total = noches * base + extra * personas adicionales, + impuesto.</p>
+        <p id="previewCostos"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>© 2025 Cabañasonline</small>
+  </footer>
+
+  <script src="./assets/app.js"></script>
+</body>
+</html>
