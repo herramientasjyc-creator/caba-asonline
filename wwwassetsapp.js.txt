@@ -1,0 +1,168 @@
+// Estado en memoria (puedes reemplazar con almacenamiento real)
+const state = {
+  costos: { baseNoche: 120000, extraPersona: 20000, impuesto: 19 },
+  usuarios: [],
+  reservas: []
+};
+
+// Utilidades
+const fmtCOP = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(n);
+const diffNoches = (inicio, fin) => {
+  const a = new Date(inicio), b = new Date(fin);
+  const ms = b - a;
+  const noches = Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+  return noches;
+};
+const calcTotal = ({ noches, personas }) => {
+  const { baseNoche, extraPersona, impuesto } = state.costos;
+  const adicionales = Math.max(0, personas - 1);
+  const subtotal = noches * baseNoche + adicionales * extraPersona * noches;
+  const total = subtotal * (1 + impuesto / 100);
+  return { subtotal, total };
+};
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(s => s.classList.remove('active'));
+    document.getElementById(target).classList.add('active');
+  });
+});
+
+// Usuarios: añadir y renderizar
+const formUsuario = document.getElementById('formUsuario');
+const tablaUsuarios = document.querySelector('#tablaUsuarios tbody');
+const rUsuarioSelect = document.getElementById('rUsuario');
+
+function renderUsuarios() {
+  tablaUsuarios.innerHTML = '';
+  rUsuarioSelect.innerHTML = '<option value="" disabled selected>Selecciona usuario</option>';
+  state.usuarios.forEach((u, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${u.nombre}</td>
+      <td>${u.email}</td>
+      <td>${u.telefono || ''}</td>
+      <td class="actions">
+        <button class="btn" data-edit="${idx}">Editar</button>
+        <button class="btn danger" data-del="${idx}">Eliminar</button>
+      </td>
+    `;
+    tablaUsuarios.appendChild(tr);
+
+    const opt = document.createElement('option');
+    opt.value = idx;
+    opt.textContent = u.nombre;
+    rUsuarioSelect.appendChild(opt);
+  });
+}
+
+tablaUsuarios.addEventListener('click', e => {
+  const delIdx = e.target.dataset.del;
+  const editIdx = e.target.dataset.edit;
+  if (delIdx !== undefined) {
+    state.usuarios.splice(Number(delIdx), 1);
+    renderUsuarios();
+    renderReservas();
+  }
+  if (editIdx !== undefined) {
+    const u = state.usuarios[Number(editIdx)];
+    document.getElementById('uNombre').value = u.nombre;
+    document.getElementById('uEmail').value = u.email;
+    document.getElementById('uTelefono').value = u.telefono || '';
+    // simple edición: eliminar y volver a guardar
+    state.usuarios.splice(Number(editIdx), 1);
+    renderUsuarios();
+  }
+});
+
+formUsuario.addEventListener('submit', e => {
+  e.preventDefault();
+  const u = {
+    nombre: document.getElementById('uNombre').value.trim(),
+    email: document.getElementById('uEmail').value.trim(),
+    telefono: document.getElementById('uTelefono').value.trim()
+  };
+  if (!u.nombre || !u.email) return;
+  state.usuarios.push(u);
+  formUsuario.reset();
+  renderUsuarios();
+});
+
+// Reservas: añadir y renderizar
+const formReserva = document.getElementById('formReserva');
+const tablaReservas = document.querySelector('#tablaReservas tbody');
+
+function renderReservas() {
+  tablaReservas.innerHTML = '';
+  state.reservas.forEach((r, idx) => {
+    const noches = diffNoches(r.inicio, r.fin);
+    const { total } = calcTotal({ noches, personas: r.personas });
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.usuarioNombre}</td>
+      <td>${r.cabana}</td>
+      <td>${r.inicio}</td>
+      <td>${r.fin}</td>
+      <td>${noches}</td>
+      <td>${r.personas}</td>
+      <td>${fmtCOP(total)}</td>
+      <td class="actions">
+        <button class="btn danger" data-del="${idx}">Cancelar</button>
+      </td>
+    `;
+    tablaReservas.appendChild(tr);
+  });
+}
+
+tablaReservas.addEventListener('click', e => {
+  const delIdx = e.target.dataset.del;
+  if (delIdx !== undefined) {
+    state.reservas.splice(Number(delIdx), 1);
+    renderReservas();
+  }
+});
+
+formReserva.addEventListener('submit', e => {
+  e.preventDefault();
+  const idxUsuario = Number(document.getElementById('rUsuario').value);
+  if (Number.isNaN(idxUsuario)) return;
+
+  const usuario = state.usuarios[idxUsuario];
+  const reserva = {
+    usuarioNombre: usuario.nombre,
+    cabana: document.getElementById('rCabana').value.trim(),
+    inicio: document.getElementById('rInicio').value,
+    fin: document.getElementById('rFin').value,
+    personas: Number(document.getElementById('rPersonas').value)
+  };
+  if (!reserva.cabana || !reserva.inicio || !reserva.fin) return;
+  state.reservas.push(reserva);
+  formReserva.reset();
+  renderReservas();
+});
+
+// Costos: actualizar y preview
+const formCostos = document.getElementById('formCostos');
+const previewCostos = document.getElementById('previewCostos');
+
+function renderPreviewCostos() {
+  const ejemploNoches = 2, ejemploPersonas = 2;
+  const { subtotal, total } = calcTotal({ noches: ejemploNoches, personas: ejemploPersonas });
+  previewCostos.textContent = `Para ${ejemploNoches} noches y ${ejemploPersonas} personas: Subtotal ${fmtCOP(subtotal)} | Total con impuesto ${fmtCOP(total)}.`;
+}
+
+formCostos.addEventListener('submit', e => {
+  e.preventDefault();
+  state.costos.baseNoche = Number(document.getElementById('cBaseNoche').value);
+  state.costos.extraPersona = Number(document.getElementById('cExtraPersona').value);
+  state.costos.impuesto = Number(document.getElementById('cImpuesto').value);
+  renderReservas(); // recalcula totales en tabla
+  renderPreviewCostos();
+});
+
+// Inicializar
+renderUsuarios();
+renderReservas();
+renderPreviewCostos();

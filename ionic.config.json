@@ -1,6 +1,7 @@
 {
-  "name": "cabañasonline",
+  "name": "cabanasonline",
   "integrations": {
     "capacitor": {}
-  }
+  },
+  "type": "angular"
 }
